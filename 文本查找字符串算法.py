@@ -30,3 +30,13 @@ if index != -1:
     print(f"'{target}' 首次出现在索引 {index} 处")
 else:
     print(f"'{target}' 不存在于文本中")
+
+import re
+
+#text = "Hello, world! This is a test."
+#target = "world"
+match = re.search(target, text)
+if match:
+    print(f"'{target}' 存在于文本中，首次出现在索引 {match.start()} 处")
+else:
+    print(f"'{target}' 不存在于文本中")

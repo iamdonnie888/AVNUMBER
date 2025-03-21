@@ -3,16 +3,49 @@
 # https://20.climaxfun.pw/forum-68-2.html
 # https://20.climaxfun.pw/forum-68-3.html
 
-# 下载豆瓣电影前十页的数据
 # （1）请求对象的定制
 # （2）获取响应的数据
 # （3）下载数据
 import urllib.parse
 import urllib.request
 import pandas as pd
+import re
 
 #from lib2to3.fixes.fix_input import context
 
+def contains_char(text, char):
+    return char in text
+
+def are_texts_not_equal(text1, text2):
+    """
+    判断两个文本是否一样
+    :param text1: 第一个文本
+    :param text2: 第二个文本
+    :return: 如果文本相同返回 True，否则返回 False
+    """
+    if text1 != text2:
+        return True
+    #else:
+    return False
+
+def find_english_words_in_mixed_text(text):
+    """
+    在中日英文混合文本中查找所有英文单词
+    :param text: 输入的混合文本
+    :return: 匹配的英文单词列表及其位置
+    """
+    # 正则表达式匹配英文单词（包括连字符和撇号）
+    word_pattern = re.compile(r'\b[A-Za-z\0-9\-\']+\b')
+    words = word_pattern.finditer(text)
+
+    matches = []
+    for match in words:
+        word = match.group()
+        #print(type(word))
+        matches.append((word, match.start(), match.end()))
+
+    print(matches)
+    return matches
 
 def get_url(page):
     # url1 = 'https://20.climaxfun.pw/forum-68-'
@@ -51,8 +84,8 @@ def get_AV_data(content):
     tree = etree.HTML(content)
     list = tree.xpath('//a[@class="s xst"]')
     data = {'Name': ['苍井空'],
-            'Number': ['ONSD—783'],
-            'Content': ['ONSD—783 そら—蒼井そら写真集']}
+            'Number': ['ONSD-783'],
+            'Content': ['ONSD-783 そら—蒼井そら写真集']}
 
     append_data = {'Name': '苍井空', 'Number': 'SONE-888', 'Content': '3'}
 
@@ -60,7 +93,16 @@ def get_AV_data(content):
     df = pd.DataFrame(data)
 
     for i in list:
-        append_data['Content'] = i.text
+        content = i.text
+        matches = find_english_words_in_mixed_text(content)
+        for match in matches:
+            if match[2] - match[1] >= 4 and are_texts_not_equal(match[0], '4KUHD') and contains_char(match[0], '-'):
+                # print("x 大于 5")  # 这行代码会被执行
+                # print(f"Found '{match[0]}' at position {match[1]} to {match[2]}")
+                #append_data['Number'] = match[0]
+                text = match[0]
+        append_data['Number'] = text.replace(" ", "")
+        append_data['Content'] = content
         append_df = pd.DataFrame([append_data])
         df = pd.concat([df, append_df], ignore_index=True)
         # print(i.text)
@@ -76,13 +118,14 @@ def write_excel_list(df, page):
 
 # 程序入口
 if __name__ == '__main__':
-    #start_page = int(input('请输入起始页码：'))
-    #end_page = int(input('请输入终止页码：'))
+    start_page = int(input('请输入起始页码：'))
+    end_page = int(input('请输入终止页码：'))
 
-    request = create_request(2)
-    content = get_content(request)
-    df = get_AV_data(content)
-    write_excel_list(df, 2)
+    for page in range(start_page, end_page + 1):
+        request = create_request(page)
+        content = get_content(request)
+        df = get_AV_data(content)
+        write_excel_list(df, page)1
 
 
 

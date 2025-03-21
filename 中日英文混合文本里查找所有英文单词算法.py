@@ -47,6 +47,7 @@ def find_english_words_in_mixed_text(text):
 #text = "DGCEMD-515 ★配信限定！特典映像付★凄テクで男を飼い慣らす女はこの世に存在する 愛瀬ゆうり"
 #text = "[4KUHD] MEYD-927 「やめてっ孕んじゃう…！」夫が海外出張中の20日間、夫の部下に毎日中出しされています。 天海つばさ"
 text = "SONE-560 S1 PRECIOUS GIRLS 2024 オールスター24名大集合ハーレムアイランドSpecial"
+#text = "SONE-604小时候我被交给叔叔照顾，他舔我的身体并发生性感的关系 白上咲花(しらかみえみか)番号作品"
 
 matches = find_english_words_in_mixed_text(text)
 
@@ -54,3 +55,16 @@ for match in matches:
     if match[2] - match[1] >= 4 and are_texts_not_equal(match[0], '4KUHD'):
         #print("x 大于 5")  # 这行代码会被执行
         print(f"Found '{match[0]}' at position {match[1]} to {match[2]}")
+
+
+def contains_char(text, char):
+    return char in text
+
+#text = "这是一段包含English单词的中日英文混合文本。Hello, world! 你好，世界。"
+pattern = r'\b[a-zA-Z0-9-]+\b'
+english_words = re.findall(pattern, text)
+print(english_words)
+
+for item in english_words:
+    if contains_char(item, '-'):
+        print(item)

@@ -29,23 +29,14 @@ def are_texts_not_equal(text1, text2):
     return False
 
 def find_english_words_in_mixed_text(text):
-    """
-    在中日英文混合文本中查找所有英文单词
-    :param text: 输入的混合文本
-    :return: 匹配的英文单词列表及其位置
-    """
-    # 正则表达式匹配英文单词（包括连字符和撇号）
-    word_pattern = re.compile(r'\b[A-Za-z\0-9\-\']+\b')
-    words = word_pattern.finditer(text)
+    pattern = r'\b[a-zA-Z0-9-]+\b'
+    english_words = re.findall(pattern, text)
+    print(english_words)
 
-    matches = []
-    for match in words:
-        word = match.group()
-        #print(type(word))
-        matches.append((word, match.start(), match.end()))
-
-    print(matches)
-    return matches
+    for item in english_words:
+        if contains_char(item, '-'):
+            print(item)
+            return item
 
 def get_url(page):
     # url1 = 'https://20.climaxfun.pw/forum-68-'
@@ -94,6 +85,7 @@ def get_AV_data(content):
 
     for i in list:
         content = i.text
+        """
         matches = find_english_words_in_mixed_text(content)
         for match in matches:
             if match[2] - match[1] >= 4 and are_texts_not_equal(match[0], '4KUHD') and contains_char(match[0], '-'):
@@ -102,6 +94,8 @@ def get_AV_data(content):
                 #append_data['Number'] = match[0]
                 text = match[0]
         append_data['Number'] = text.replace(" ", "")
+         """
+        append_data['Number'] = find_english_words_in_mixed_text(content)
         append_data['Content'] = content
         append_df = pd.DataFrame([append_data])
         df = pd.concat([df, append_df], ignore_index=True)
@@ -125,7 +119,7 @@ if __name__ == '__main__':
         request = create_request(page)
         content = get_content(request)
         df = get_AV_data(content)
-        write_excel_list(df, page)1
+        write_excel_list(df, page)
 
 
 
